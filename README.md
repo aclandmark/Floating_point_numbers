@@ -2,7 +2,7 @@
 
 Looks at how FPN's can be generated, displayed and used in arithmetic.
 
-For many of us who feel quite comforable with integer numbers and arithmetic floating point numbers (FPN's) may look a bit mysterious when first encountered.
+For many of us who feel quite comforable with integer numbers and arithmetic, floating point numbers (FPN's) may look a bit mysterious when first encountered.
 
 Simple programs are posted here which aim to clarify any confusion.
 

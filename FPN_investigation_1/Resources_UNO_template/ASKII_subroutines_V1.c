@@ -1,0 +1,80 @@
+
+
+
+/**********************************************************************************************/
+char isCharavailable (int m){int n = 0;										//For m = 1 waits a maximun of 7.8mS
+while (!(Serial.available())){n++;											//before returning zero
+if (n>4000) {m--; n = 0;}if (m == 0)return 0;}								//Returns 1 immediately that a char is received
+return 1;}
+
+
+
+char waitforkeypress(void){
+while (!(Serial.available()));
+return Serial.read();}
+
+
+/***************************************************************************************************************************************/
+char decimal_digit (char data){
+if (((data > '9') || (data < '0')) )return 0;
+else return 1;}
+
+
+/***************************************************************************************************************************************/
+char wait_for_return_key(void){  											//Returns keypress
+char keypress, temp;															//but converts \r\n, \r or \n to \r
+while (!(Serial.available())); 
+keypress = Serial.read();
+if((keypress == '\r') || (keypress == '\n')){
+if (isCharavailable(1)){temp = Serial.read();}keypress = '\r';}
+return keypress;}
+
+
+
+/***************************************************************************************************************************************/
+char Float_from_KBD(char* array){                    								//Acquires an integer string from the keyboard and returns the binary equivalent
+char keypress;
+char array_ptr;
+char dp_ptr;
+
+
+array_ptr = 0;
+ 
+for(int n = 0; n<=14; n++) array[n] = 0;                           		//Clear the buffer used to the string
+do
+{while (!(Serial.available())); 
+keypress = Serial.read();} 
+while ((!(decimal_digit(keypress)))
+&& (keypress != '-')
+&& (keypress != '.'));
+
+if (keypress == '.')dp_ptr = array_ptr;
+array[array_ptr++] = keypress;
+ 
+Serial.write(keypress); 
+ 
+while(1){																	//continue statement brings program flow back here 
+if ((keypress = wait_for_return_key())  =='\r')break;               		//Detect return key press (i.e \r or\r\n)
+
+if ((decimal_digit(keypress)) || (keypress == '.')							//Acceptable keypresses
+|| (keypress == '\b')
+|| (keypress == 'E') || (keypress == 'e'))
+
+{if(keypress == '\b'){array[--array_ptr] = 0; Serial.write('\b');continue;}			//Del key pressed
+
+{if (keypress == '.'){dp_ptr = array_ptr;
+array[array_ptr++] = 0; Serial.write('.');continue;}
+
+array[array_ptr++] = keypress;}
+
+Serial.write(keypress);}}                                                                  		//Update display includes "cr_keypress"                                                 
+Serial.write("\r\n");
+return dp_ptr;}
+
+
+
+
+/**************************************************************************************************************************/
+
+
+

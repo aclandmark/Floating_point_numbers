@@ -75,7 +75,7 @@ ltoa(LHS_of_dp, data_buff, 10);
 Serial.write(data_buff);
 
 
-binary_places = binary_places  & (~(LHS_of_dp << (23 - expt_2)));
+binary_places = binary_places  & (~(LHS_of_dp << (23 - expt_2)));  //23
 
 Serial.write("\r\nRHS bits are\t");
 Binary_to_PC(binary_places);
@@ -83,7 +83,7 @@ Binary_to_PC(binary_places);
 
 
 Serial.write("  which converts to 0.");
-binary_points_to_decimal(binary_places, 32, num_decimal_places);            //All available binary places are to be used
+binary_points_to_decimal(binary_places, expt_2, num_decimal_places);            //All available binary places are to be used
 
 Serial.write("\r\n"); }}
 
@@ -130,16 +130,12 @@ return result;}
 
 
 /********************************************************************************************************/
-void binary_points_to_decimal(long binary_points, int precision, int Num_dps){
+void binary_points_to_decimal(long binary_points, long expt_2, int Num_dps){
 long denominator = 1;                                                       
 char result;                                                                //Takes the binary places as an integer number
 long remainder;                                                             //converts it to a fraction and
                                                                             //converts this to decimal places
-binary_points = (unsigned long)binary_points >> (32 - precision);
-while (denominator <= binary_points)denominator *= 2; 
-
-//Serial.write("\r\n");
-//Binary_to_PC(binary_points);Serial.write("  which converts to 0.");
+denominator = (unsigned long)0x80000000 >> (8 + expt_2);
 
 remainder = binary_points;
 for (int m = 0; m < Num_dps; m++){

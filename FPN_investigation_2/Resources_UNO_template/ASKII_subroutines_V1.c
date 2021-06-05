@@ -48,10 +48,11 @@ while ((!(decimal_digit(keypress)))
 && (keypress != '-')
 && (keypress != '.'));
 
-if (keypress == '.')dp_ptr = array_ptr;
-array[array_ptr++] = keypress;
- 
 Serial.write(keypress); 
+
+if (keypress == '.'){dp_ptr = array_ptr;
+array[array_ptr++] = 0;}
+else array[array_ptr++] = keypress;
  
 while(1){																	//continue statement brings program flow back here 
 if ((keypress = wait_for_return_key())  =='\r')break;               		//Detect return key press (i.e \r or\r\n)
@@ -70,7 +71,7 @@ array[array_ptr++] = keypress;}												//Save keypress to string
 
 Serial.write(keypress);}}                                                    //Update display includes "cr_keypress"                                                 
 Serial.write("\r\n");
-return ++dp_ptr;}															//Return location of the first decimal place
+return dp_ptr;}															//Return location of the first decimal place
 
 
 

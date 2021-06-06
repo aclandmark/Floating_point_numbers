@@ -136,6 +136,8 @@ for (int m = 0; m <= 15; m++){if ((m) && !(m%4))Serial.write(' ');
   for (int m = 0; m <= 15; m++){if ((m) && !(m%4))Serial.write(' ');
   if (LB & (1 << (15 - m)))Serial.write('1'); else Serial.write('0');}}
 
+
+
 /********************************************************************************************************/
 void FNP_in_binary_to_PC(long num){                                  
 char counter = 0;

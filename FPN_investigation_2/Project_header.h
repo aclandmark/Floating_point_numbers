@@ -3,6 +3,8 @@
 
 char data_buff[15];                                            //Used to hold numerical strings
 
+#define positive 1
+#define negative 0
 
 /***************************************************************************************************/
 #define setup_328_HW \

@@ -32,7 +32,7 @@ return keypress;}
 
 
 /***************************************************************************************************************************************/
-char Real_num_from_KBD(char* array, char* sign){                    		//Acquires an integer string from the keyboard and returns the binary equivalent
+char Real_num_from_KBD(char* array, char* sign){                    		//Acquires an RN string from the keyboard and returns the binary equivalent
 char keypress;
 char array_ptr;
 char dp_ptr;

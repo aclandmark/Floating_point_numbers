@@ -32,7 +32,7 @@ return keypress;}
 
 
 /***************************************************************************************************************************************/
-char Float_from_KBD(char* array){                    						//Acquires an integer string from the keyboard and returns the binary equivalent
+char Float_from_KBD(char* array, char* sign){                    			//Acquires an integer string from the keyboard and returns the binary equivalent
 char keypress;
 char array_ptr;
 char dp_ptr;
@@ -43,17 +43,15 @@ array_ptr = 0;
 for(int n = 0; n<=14; n++) array[n] = 0;                           			//Clear the buffer used for the string
 
 do
-{while (!(Serial.available())); 
+{while (!(Serial.available())); 											//Wait for keypress
 keypress = Serial.read();} 
 while ((!(decimal_digit(keypress)))
-&& (keypress != '-')
-&& (keypress != '.'));
+&& (keypress != '-'));														//Ignore illegal keypresses
 
-Serial.write(keypress); 
+Serial.write(keypress); 													//Echo keypress
 
-if (keypress == '.'){dp_ptr = array_ptr;
-array[array_ptr++] = 0;}
-else array[array_ptr++] = keypress;
+if (keypress == '-') *sign = negative;
+else array[array_ptr++] = keypress;											//Save keypress to buffer
  
 while(1){																	//continue statement brings program flow back here 
 if ((keypress = wait_for_return_key())  =='\r')break;               		//Detect return key press (i.e \r or\r\n)

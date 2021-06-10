@@ -41,6 +41,7 @@ char dp_ptr;
 array_ptr = 0;
  
 for(int n = 0; n<=14; n++) array[n] = 0;                           			//Clear the buffer used for the string
+
 do
 {while (!(Serial.available())); 
 keypress = Serial.read();} 
@@ -69,9 +70,12 @@ array[array_ptr++] = 0; Serial.write('.');continue;}
 
 array[array_ptr++] = keypress;}												//Save keypress to string
 
-Serial.write(keypress);}}                                                    //Update display includes "cr_keypress"                                                 
-Serial.write("\r\n");
-return dp_ptr;}															//Return location of the first decimal place
+Serial.write(keypress);}}                                                   //Update display includes "cr_keypress"                                                 
+
+if(!(dp_ptr))dp_ptr = 14;													//Tells the "main" routine that an integer number has been entered.			
+
+Serial.write('\t');
+return dp_ptr;}																//Return location of the first decimal place
 
 
 

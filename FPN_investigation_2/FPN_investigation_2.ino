@@ -23,6 +23,8 @@ int num_decimal_places;                                             //Entered by
 char LHS_length;                                                    //Number of binary characters on LHS of binary point
 int expt_2;                                                         //Exponent to which binary number is raised.
 unsigned long FPN;                                                  //Floating point number
+char sign; 
+
 
 setup_328_HW;                                                       //see header file"
 sei();
@@ -38,7 +40,8 @@ if ((keypress  == 'F')||
 while(1){
 
 Serial.write("\r\n\r\nFPN from keyboard\t");                          //User enters floating point number (FPN)
-dp_location = Float_from_KBD(data_buff);                              //Subroutine echoes keypresses to screen
+sign = positive;                                                      //Default setting
+dp_location = Float_from_KBD(data_buff, &sign);                       //Subroutine echoes keypresses to screen
 
 
 /********Proces the integer part of the non-integer number*********************************************************************/
@@ -48,11 +51,11 @@ expt_2 = 127 + (LHS_length - 1);                                      //Floating
 
 
 /********Procces the fractional part of the number*********************************************************************/
-if(dp_location == 14)                                                //Set to 14 in the absence of any decimal places
-binary_places = 0;                                                    //No binary places present.
+if(dp_location == 14)                                                 //Set to 14 in the absence of any decimal places
+binary_places = 0;                                                    //No binary places required.
 
 else
-{RHS_of_dp = atol(data_buff + dp_location + 1);                        //Convert the decimal places to an integer number
+{RHS_of_dp = atol(data_buff + dp_location + 1);                       //Convert the decimal places to an integer number
 num_leading_zeros = 0;                                                //Check for the presence of leading zeros (i.e. 7.0005)
 next_decimal_place = dp_location + 1;                                 //Location of first decimal place
 while ((data_buff[next_decimal_place++]) == '0')
@@ -62,11 +65,11 @@ binary_places =
 decimal_to_binary(RHS_of_dp,LHS_length,num_leading_zeros); }         //Convert the integer to the max allowed num of binary places 
 
 
-/********Assemble the FPN****************************************************************/
+/********Start assembly of the FPN****************************************************************/
 if (LHS_length){FPN = LHS_of_dp << (25 - LHS_length);                  //Shift MSB to bit 24
 FPN = FPN | binary_places;}                                            //Start building the FPN
 
-else {FPN = binary_places;                                            //Special case: There are bits no LHS of the binary point
+else {FPN = binary_places;                                            //Special case: There are bits on the LHS of the binary point
 while (!(FPN & (( 0x80000000 >> 7))))                                 //LHS_of_dp is zero                 
 {FPN = (FPN << 1);expt_2 -= 1;}}                                      //Shift MS '1' of binary places to bit 24
 
@@ -81,6 +84,8 @@ if (FPN & (0x80000000 >> 7))                                           //Special
 FPN = FPN & (~(0x800000));                                            //Clear bit 23: The MSB of the integer number
 FPN = FPN | ((unsigned long)expt_2 << 23);                            //Copy in the exponent
 
+if (sign == negative)FPN |= 0x80000000;                               //Add in the sign bit
+
 Serial.write("FPN equivalent\t");
 FNP_in_binary_to_PC(FPN);
 
@@ -90,13 +95,15 @@ FNP_in_binary_to_PC(FPN);
 
 Serial.write ("\r\n\r\nReverse the process\r\n");
 
+if (FPN & (0x80000000)) {sign = negative;                        //Check for a negative sign                  
+FPN &= (~(0x80000000));}                                         //Clear sign bit
+
 Serial.write ("\r\nNo. decimal places (Enter 0 - 32)?    ");
-Float_from_KBD(data_buff);                                        //Enter number of decimal places required
+Float_from_KBD(data_buff,&sign);                                 //Enter number of decimal places required
 num_decimal_places = atol(data_buff);
 
 expt_2 = ((FPN >> 23) & 0x1FF) - 127;                             //Recover the exponent
 ltoa(expt_2, data_buff, 10);
-
 Serial.write("\r\nTwo's exponent is  ");
 Serial.write(data_buff);
 
@@ -104,9 +111,11 @@ binary_digits = FPN & (~(0xFF800000));                          //Mask of expone
 binary_digits |= 0x800000;                                      //Reinstate the missing 1 (the most significant bit)
 
 LHS_of_dp = binary_digits >> (23 - expt_2);                     //Remove binary places leaving just the LHS of the binary point
+
 Serial.write("\r\n\r\nLHS bits are\t");
 Binary_to_PC(LHS_of_dp);
 Serial.write("  which converts to ");
+if(sign == negative) Serial.write('-');
 ltoa(LHS_of_dp, data_buff, 10);
 Serial.write(data_buff);
 
@@ -137,8 +146,8 @@ return len;}
  
 
 /********************************************************************************************************/
-void Binary_to_PC(long num){                                              //Sends a binary number to ther screen as ones and zeros
-  int HB, LB;                                                             //High byyte and low byte
+void Binary_to_PC(long num){                                              //Sends a binary number to the screen as ones and zeros
+  int HB, LB;                                                             //High byte and low byte
   
   HB = num >> 16;
   LB = num;

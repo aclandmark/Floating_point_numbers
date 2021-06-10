@@ -39,9 +39,9 @@ if ((keypress  == 'F')||
 
 while(1){
 
-Serial.write("\r\n\r\nFPN from keyboard\t");                          //User enters floating point number (FPN)
+Serial.write("\r\n\r\nRN from keyboard\t");                          //User enters a real number to be converted to a FPN
 sign = positive;                                                      //Default setting
-dp_location = Float_from_KBD(data_buff, &sign);                       //Subroutine echoes keypresses to screen
+dp_location = Real_num_from_KBD(data_buff, &sign);                    //Subroutine echoes keypresses to screen
 
 
 /********Proces the integer part of the non-integer number*********************************************************************/
@@ -99,7 +99,7 @@ if (FPN & (0x80000000)) {sign = negative;                        //Check for a n
 FPN &= (~(0x80000000));}                                         //Clear sign bit
 
 Serial.write ("\r\nNo. decimal places (Enter 0 - 32)?    ");
-Float_from_KBD(data_buff,&sign);                                 //Enter number of decimal places required
+Real_num_from_KBD(data_buff,&sign);                              //Enter number of decimal places required
 num_decimal_places = atol(data_buff);
 
 expt_2 = ((FPN >> 23) & 0x1FF) - 127;                             //Recover the exponent

@@ -41,5 +41,4 @@ WDTCSR = 0;
 
 
 /******************************************************************************************************/
-//#include "Resources_UNO_template\UNO_template_header_V1.h"
 #include "Resources_UNO_template\ASKII_subroutines_V1.c"

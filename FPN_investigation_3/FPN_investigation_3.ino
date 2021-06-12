@@ -41,28 +41,31 @@ Serial.write(data_buff);
 
 
 dp_ptr = 0;
-while (data_buff[dp_ptr] != '.')
-{if(data_buff[dp_ptr++] > '0')
+while (data_buff[dp_ptr] != '.')                                    //Scann the numerical string looking for the dp.
+{if(data_buff[dp_ptr++] > '0')                                      //Is a non zero digit encountered first
 
-{dp_ptr = 0;Serial.write ("CD");
-while (data_buff[dp_ptr++] != '.');
-for (int m = dp_ptr-1; m >= 2; m--)
-data_buff[m] = data_buff[m - 1];
-data_buff [1] = '.';
-dp_location = 1;
-expt_10 = dp_ptr - 2;
+{dp_ptr = 0;                                                        //If yes 
+while (data_buff[dp_ptr++] != '.');                                 //continue untill the dp has been located
+for (int m = dp_ptr-1; m >= 2; m--)                                 //Shift all digits bar the first one space right 
+data_buff[m] = data_buff[m - 1];                                    //to occuppy the space originally occupied by the dp
+data_buff [1] = '.';                                                //Place the dp in the vacated space
+dp_location = 1;                                                    //Sett the dp location for the RN to FPN subroutine
+expt_10 = dp_ptr - 2;                                               //Shifing the dp requires an adjustment to the tens exponent
 
 Serial.write("\r\n");
 Serial.write(data_buff); Serial.write ('E'); Serial.write (expt_10 + '0');break;}}
 
-if (data_buff[dp_ptr] == '.')
-{expt_10 = 0;Serial.write ("AB");
-while ((data_buff[dp_ptr + 1])  == '0'){
-{for(int m = dp_ptr + 1; m < 13; m++)data_buff[m] = data_buff[m + 1];}
-data_buff[14] = 0;expt_10 -= 1;}
-data_buff[dp_ptr] = data_buff[dp_ptr + 1];
+if (data_buff[dp_ptr] == '.')                                       //There are no non zero digits to the left of the dp  
+{expt_10 = 0;
+while ((data_buff[dp_ptr + 1])  == '0'){                            //Check for the presence of a non zero digit immediately to the left of the dp                           
+{for(int m = dp_ptr + 1; m < 13; m++)                               //Shift all digits comming after the dp one place to the left
+data_buff[m] = data_buff[m + 1];}
+data_buff[14] = 0;                                                  //Clear the least significant digit
+expt_10 -= 1;}                                                       //Adjust the tens exponent
+
+data_buff[dp_ptr] = data_buff[dp_ptr + 1];                          //Move the dp one place to the right allong the string                           
 data_buff[dp_ptr + 1] = '.';
-dp_location = dp_ptr + 1;
+dp_location = dp_ptr + 1;                                           //Required by the RN to FPN subroutine
 expt_10 -= 1;
 Serial.write("\r\n");
 Serial.write(data_buff);Serial.write ("E-"); Serial.write (expt_10 * -1 + '0');

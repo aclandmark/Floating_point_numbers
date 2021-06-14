@@ -3,6 +3,8 @@
 
 char data_buff[15];                                            //Used to hold numerical strings
 
+#define positive 1
+#define negative 0
 
 /***************************************************************************************************/
 #define setup_328_HW \
@@ -41,5 +43,4 @@ WDTCSR = 0;
 
 
 /******************************************************************************************************/
-//#include "Resources_UNO_template\UNO_template_header_V1.h"
 #include "Resources_UNO_template\ASKII_subroutines_V1.c"

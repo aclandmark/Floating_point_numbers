@@ -3,9 +3,7 @@
 
 char data_buff[15];                                                 //Used to hold numerical strings
 char keypress;                                                 
-unsigned long FPN;                                                  //Floating point number
-char sign; 
-char dp_location;                                                   //Location of decimal point in real number string
+ 
 
 
 

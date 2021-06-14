@@ -1,10 +1,16 @@
 
 #include <avr/wdt.h>
 
-char data_buff[15];                                            //Used to hold numerical strings
+char data_buff[15];                                                 //Used to hold numerical strings
+char keypress;                                                 
+ 
+
+
 
 #define positive 1
 #define negative 0
+
+
 
 /***************************************************************************************************/
 #define setup_328_HW \
@@ -44,3 +50,4 @@ WDTCSR = 0;
 
 /******************************************************************************************************/
 #include "Resources_UNO_template\ASKII_subroutines_V1.c"
+#include "Resources_UNO_template\FPN_subroutines.c"

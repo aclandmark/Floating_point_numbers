@@ -9,15 +9,18 @@ return 1;}
 
 
 
+/**********************************************************************************************/
 char waitforkeypress(void){
 while (!(Serial.available()));
 return Serial.read();}
+
 
 
 /***************************************************************************************************************************************/
 char decimal_digit (char data){
 if (((data > '9') || (data < '0')) )return 0;
 else return 1;}
+
 
 
 /***************************************************************************************************************************************/
@@ -31,22 +34,25 @@ return keypress;}
 
 
 
+
 /***************************************************************************************************************************************/
-char Real_num_from_KBD(char* array, char* sign){                    		//Acquires an RN string from the keyboard and returns the binary equivalent
+char Scientific_num_from_KBD(char* array, char* sign){     					//Acquires an integer string from the keyboard and returns the binary equivalent
 char keypress;
 char array_ptr;
-char dp_ptr;
+char dp_ptr;																//Holds location of the decimal point
+char E_ptr;																	//Holds location of the E char.  If zero there is no exponent.
 
-
+dp_ptr = 0;
 array_ptr = 0;
- 
+E_ptr = 0;
+
 for(int n = 0; n<=14; n++) array[n] = 0;                           			//Clear the buffer used for the string
 
 do
 {while (!(Serial.available())); 											//Wait for keypress
 keypress = Serial.read();} 
 while ((!(decimal_digit(keypress)))
-&& (keypress != '-'));														//Ignore illegal keypresses
+&& (keypress != '-'));														//Ignore illegal keypresses including a decimal point at this stage
 
 Serial.write(keypress); 													//Echo keypress
 
@@ -57,23 +63,29 @@ while(1){																	//continue statement brings program flow back here
 if ((keypress = wait_for_return_key())  =='\r')break;               		//Detect return key press (i.e \r or\r\n)
 
 if ((decimal_digit(keypress)) || (keypress == '.')							//Acceptable keypresses
-|| (keypress == '\b')
+|| (keypress == '\b') || (keypress == '-')
 || (keypress == 'E') || (keypress == 'e'))
 
 {if(keypress == '\b'){array[--array_ptr] = 0; Serial.write('\b');			//Del key pressed
 continue;}																	//Go straight to top of while loop															
 
-{if (keypress == '.'){dp_ptr = array_ptr;									//Save location of decimal point
-array[array_ptr++] = 0; Serial.write('.');continue;}
+{if (keypress == '.')dp_ptr = array_ptr;									//Save location of decimal point
+
+
+if ((keypress == 'E') || (keypress == 'e')){								//dp requred at end of numeric string if one has not already been entered
+if(!(dp_ptr)){array[array_ptr] = '.'; dp_ptr = array_ptr++;}
+E_ptr = array_ptr;}
 
 array[array_ptr++] = keypress;}												//Save keypress to string
 
 Serial.write(keypress);}}                                                   //Update display includes "cr_keypress"                                                 
 
-if(!(dp_ptr))dp_ptr = 14;													//Tells the "main" routine that an integer number has been entered.			
+//if(!(dp_ptr))dp_ptr = 14;	///see next line								//Tells the "main" routine that an integer number has been entered.			
+if(!(dp_ptr)){array[array_ptr] = '.'; dp_ptr = array_ptr;}					//CHECK WITH FPN_INVESTIGATION_2!!!!!!!!!!!!!!!!!!!!
+
 
 Serial.write('\t');
-return dp_ptr;}																//Return location of the first decimal place
+return E_ptr;}																//Return location of the first decimal place
 
 
 

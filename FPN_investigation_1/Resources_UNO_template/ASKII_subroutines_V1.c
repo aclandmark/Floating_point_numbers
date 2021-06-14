@@ -32,45 +32,45 @@ return keypress;}
 
 
 /***************************************************************************************************************************************/
-char Float_from_KBD(char* array){                    						//Acquires an integer string from the keyboard and returns the binary equivalent
+char Real_num_from_KBD(char* array, char* sign){                    		//Acquires an RN string from the keyboard and returns the binary equivalent
 char keypress;
 char array_ptr;
 char dp_ptr;
 
-
 array_ptr = 0;
  
 for(int n = 0; n<=14; n++) array[n] = 0;                           			//Clear the buffer used for the string
+
 do
-{while (!(Serial.available())); 
+{while (!(Serial.available())); 											//Wait for keypress
 keypress = Serial.read();} 
 while ((!(decimal_digit(keypress)))
-&& (keypress != '-')
-&& (keypress != '.'));
+&& (keypress != '-'));														//Ignore illegal keypresses
 
-if (keypress == '.')dp_ptr = array_ptr;
-array[array_ptr++] = keypress;
- 
-Serial.write(keypress); 
+Serial.write(keypress); 													//Echo keypress
+
+if (keypress == '-') *sign = negative;
+else array[array_ptr++] = keypress;											//Save keypress to buffer
  
 while(1){																	//continue statement brings program flow back here 
 if ((keypress = wait_for_return_key())  =='\r')break;               		//Detect return key press (i.e \r or\r\n)
 
 if ((decimal_digit(keypress)) || (keypress == '.')							//Acceptable keypresses
-|| (keypress == '\b')
-|| (keypress == 'E') || (keypress == 'e'))
+|| (keypress == '\b'))
 
 {if(keypress == '\b'){array[--array_ptr] = 0; Serial.write('\b');			//Del key pressed
 continue;}																	//Go straight to top of while loop															
 
-{if (keypress == '.'){dp_ptr = array_ptr;									//Save location of decimal point
-array[array_ptr++] = 0; Serial.write('.');continue;}
+{if (keypress == '.')dp_ptr = array_ptr;									//Save location of decimal point
 
 array[array_ptr++] = keypress;}												//Save keypress to string
 
-Serial.write(keypress);}}                                                    //Update display includes "cr_keypress"                                                 
-Serial.write("\r\n");
-return ++dp_ptr;}															//Return location of the first decimal place
+Serial.write(keypress);}}                                                   //Update display                                                 
+	
+if(!(dp_ptr)){array[array_ptr] = '.'; dp_ptr = array_ptr;}					//A dp is required
+
+Serial.write('\t');
+return dp_ptr;}																//Return location of the first decimal place
 
 
 

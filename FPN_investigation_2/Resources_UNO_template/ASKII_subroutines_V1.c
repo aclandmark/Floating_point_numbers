@@ -1,4 +1,4 @@
-
+void print_long(long );
 
 
 /**********************************************************************************************/
@@ -80,8 +80,7 @@ array[array_ptr++] = keypress;}												//Save keypress to string
 
 Serial.write(keypress);}}                                                   //Update display includes "cr_keypress"                                                 
 
-//if(!(dp_ptr))dp_ptr = 14;	///see next line								//Tells the "main" routine that an integer number has been entered.			
-if(!(dp_ptr)){array[array_ptr] = '.'; dp_ptr = array_ptr;}					//CHECK WITH FPN_INVESTIGATION_2!!!!!!!!!!!!!!!!!!!!
+if(!(dp_ptr)){array[array_ptr] = '.'; dp_ptr = array_ptr;}					//Terminate array in dp if one has not already been entered
 
 
 Serial.write('\t');
@@ -91,6 +90,150 @@ return E_ptr;}																//Return location of the first decimal place
 
 
 /**************************************************************************************************************************/
+void Round_print_buff(char * array)
+
+{char sign = positive;
+int expt_10 = 0;
+char E_ptr = 0, dp_ptr = 0;
+long num;
+char string_length;
+
+
+if (array[0] == '-') {sign = negative;									//If negative number save sign
+for(int m = 0; m <= 13; m++) array[m] = array[m+1];}					//and shift array one place left
+
+if (array[0] == '0')													//If leading zero present: remove it
+{for(int m = 0; m <= 13; m++)array[m] = array[m+1]; 
+array[14] = 0;}
+
+for(int m = 0; m <= 14; m++) 
+{if(array[m] == 'E'){E_ptr = m; break;}}								//Scan array for exponent
+if(E_ptr){expt_10 = atoi(array + E_ptr + 1);							//and save it
+for(int m = E_ptr; m <= 14; m++) array[m] = 0;}							//Clear the exponent
+
+for(int m = 0; m <= 13; m++) 											//Scan array for dp
+{if(array[m] == '.'){dp_ptr = m; break;}}								//and save its location
+for(int m = dp_ptr; m <= 13; m++)array[m] = array[m+1];					//Overwrite the dp
+array[14] = 0;
+
+string_length = strlen(array); 											//String length: No dp, no sign, no exponent  and no leading zero.
+
+num = atol(array);														//Convert string to number
+num += 5;																//round final digit
+num /= 10.0;															//and remove it
+
+ltoa(num, array, 10);													//Convert number back to a string
+
+if(string_length == strlen(array)) {dp_ptr += 1; }						//If leading one generated shift dp one place
+
+for (int m = 14; m > dp_ptr; m--)array[m] = array[m - 1];				//Reinsert the dp
+array[dp_ptr] = '.';
+
+if(sign == negative){for(int m = 14; m; m--)array[m] = array[m-1];		//Reinsert the negative sign if needed
+array[0] = '-';}
+
+for (int m = 0; m <= 14; m++){											//Reinsert the exponent
+if (!(array[m])){E_ptr = m; break;}}
+if (expt_10){
+array[E_ptr] = 'E';
+itoa(expt_10, array + E_ptr + 1, 10);}
+
+if (array[0] == '.')													//Reinstate leading zero if needed
+{for(int m = 14; m; m--)array[m] = array[m-1]; array[0] = '0';}}
 
 
 
+
+/*
+void print_long(long l_num){
+char array[15];
+ltoa(l_num, array, 10);
+Serial.write(array);}
+
+
+
+void Round_print_buff(char * array)
+
+{char sign = positive;
+int expt_10 = 0;
+char E_ptr = 0, dp_ptr = 0;
+long num;
+char string_length;
+char zero = 0;
+
+if (array[0] == '-') {sign = negative;									//If negative number save sign
+for(int m = 0; m <= 13; m++) array[m] = array[m+1];}					//and shift array one place left
+
+Serial.write("\r\nA");
+Serial.write(array);													//ARRAY with Sign removed
+
+//If 0._ _ _ shift array left to remove the zero
+if (array[0] == '0'){for(int m = 0; m <= 13; m++)array[m] = array[m+1]; array[14] = 0;
+Serial.write("\r\nAa");
+Serial.write(array);}
+
+
+for(int m = 0; m <= 14; m++) 
+{if(array[m] == 'E'){E_ptr = m; break;}}								//Scan array for exponent
+if(E_ptr){expt_10 = atoi(array + E_ptr + 1);							//and save it
+for(int m = E_ptr; m <= 14; m++) array[m] = 0;							//Clear the exponent
+Serial.write("\r\nB");												//Print exponent
+print_long(expt_10);}
+
+
+for(int m = 0; m <= 13; m++) 											//Scan array for dp
+{if(array[m] == '.'){dp_ptr = m; break;}}								//and save its location
+for(int m = dp_ptr; m <= 13; m++)array[m] = array[m+1];					//Overwrite the dp
+array[14] = 0;
+
+
+Serial.write("\r\nCc");
+num = atol(array);
+print_long(num);
+
+
+string_length = strlen(array); 											//String length: No dp, No sign and No exponent No zero pt.
+Serial.write("\r\nC");
+Serial.write(string_length + '0');
+
+Serial.write("  ");
+num = atol(array);
+print_long(num);
+
+
+num += 5;
+Serial.write("\r\nD");
+print_long(num);
+
+Serial.write("\r\nE"); 
+
+
+num /= 10.0;
+print_long(num );
+
+
+ltoa(num, array, 10);
+
+if(string_length == strlen(array)) {dp_ptr += 1; Serial.write("Ff");}
+
+Serial.write("\r\n");
+
+for (int m = 14; m > dp_ptr; m--)array[m] = array[m - 1];
+array[dp_ptr] = '.';
+
+
+if(sign == negative){for(int m = 14; m; m--)array[m] = array[m-1];
+array[0] = '-';}
+Serial.write(array);
+
+Serial.write("\r\n");
+
+for (int m = 0; m <= 14; m++){
+if (!(array[m])){E_ptr = m; break;}}
+if (expt_10){
+array[E_ptr] = 'E';
+itoa(expt_10, array + E_ptr + 1, 10);}
+
+if (array[0] == '.'){for(int m = 14; m; m--)array[m] = array[m-1]; array[0] = '0';}}
+
+*/

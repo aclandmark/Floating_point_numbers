@@ -13,14 +13,17 @@ Repeated multiplication or division by 10 is then used to amalgamate the exponen
 
 int main (void){ 
   
-float FPNum; 
-float num2 = 1.5e3;
-
-char T_array[15];
-char expt_10_string[6];
-char E_ptr;
+char data_buff[15];                                                 //Numerical string entered at keyboard
+char print_buff[15];                                                //Desination for the float to askii characters
+float FPNum;                                                        //Binary equivalent of the characters held in data_buff
 int expt_10;
+char expt_10_string[6];                                             //Used to echo exponent to the screen
+
+char E_ptr;                                                         //Points to the exponent in data_buff
 char sign; 
+char num_decimal_places, num_range;                                 //Used to format contents of print_buff                                          
+unsigned long *long_ptr;                                            //Used to read FPN in unsigned long format
+long_ptr = (unsigned long *) &FPNum;
 
 
 setup_328_HW;                                                       //see header file"
@@ -37,17 +40,18 @@ if ((keypress  == 'F')||
 
 while(1){
 
-Serial.write("\r\n\r\nFPN from keyboard\t");                          //User enters floating point number (FPN)
+Serial.write("\r\n\r\nFPN conversion to binary\r\n\
+\r\nEcho keyboard input\t\t");                                        //User enters floating point number (FPN)
 
 sign = positive;                                                      //Default setting
 E_ptr = Scientific_num_from_KBD(data_buff, &sign);                    //Subroutine echoes keypresses to screen
 
 if(E_ptr){expt_10 = atoi(data_buff + E_ptr + 1);                      //Read the exponent if there is one 
 data_buff[E_ptr] = 0;}                                                //Ensure the number string is terminated in a zero
-else expt_10 = 0;                                                     //Set to zero if no exponent was enntered.
+else expt_10 = 0;                                                     //Set to zero if no exponent was entered.
 
 expt_10 += Justify_Num_string(data_buff);                             //Shift the dp so that there is only one digit on its LHS
-Serial.write('\t');
+Serial.write("\r\n\r\nPost string justification\t");
 
 itoa(expt_10, expt_10_string, 10);                                    //Echo the string prior to its conversion to a FPN
 if (sign == negative)Serial.write ('-');
@@ -67,31 +71,58 @@ while (expt_10){FPNum *= 10; expt_10 -= 1;}}
 if (expt_10 < 0){                                                    //Repeatedly divide FPNum untill its exponent is zero
 while (expt_10){FPNum /= 10; expt_10 += 1;}}
 
-
-Serial.write("\r\nFPN equivalent\t");
+Serial.write("\r\nFPN equivalent\t\t");
 FNP_in_binary_to_PC(FPNum);
 
+Serial.write("\r\n\r\nDoing some arithmetic\t");
+FPNum = pow(FPNum, 3);
+
+FNP_in_binary_to_PC(FPNum);                                         //Print out FPN in binary
+
+if  ((*long_ptr == 0x7F800000) ||                                   //Check for overflow in arithmetic
+    (*long_ptr == 0xFF800000) | 
+    (*long_ptr == 0X0) ||
+    (*long_ptr == 0X80000000))
+{Serial.write("\r\n\r\nOverflow:Reset UNO to continue\r\n");while(1);}
 
 
 
-/********Reverse the proces to recover the real number****************************************************************/
 
-Serial.write ("\r\n\r\nReverse the process");
+/********Reverse the proces: Step 1 Set the print format****************************************************************/
 
-expt_10 = 0;
-while((FPNum > 10) || (FPNum < -10))                               //For numbers greater than +/- 10
-{FPNum /= 10; expt_10 += 1;}                                       //repeatedly divide them by 10
+Serial.write ("\r\n\r\nFloating point to string\t");
+sign = positive;                                              //Default value
+if (FPNum < 0){FPNum *= -1.0; sign = negative;}               //Determine sign and clear the sign bit
+
+if (FPNum >= 10000.0)  num_range = 1;                         //Specify the numerical ranges used to define the output format
+if ((FPNum < 10000.0) && (FPNum >= 10.0)) num_range = 2;
+if ((FPNum < 10.0) && (FPNum >= 0.01)) num_range = 3;
+if (FPNum < 0.01)num_range = 4;
+
+expt_10 = 0;                                                  //Calculate the exponents and define the number of decimal places                                                
+switch (num_range){                                           
+case 1: while(FPNum > 10)
+{FPNum /= 10.0; expt_10 += 1;}num_decimal_places = 5; break;
+case 2: num_decimal_places = 3; break;
+case 3: num_decimal_places = 4; break;
+case 4: while(FPNum < 1.0)
+{FPNum *= 10.0; expt_10 -= 1;}num_decimal_places = 5; break;}
 
 
-while((FPNum < 1) && (FPNum > -1))                                 //For numbers smaller than +/- 1
-{FPNum *= 10; expt_10 -= 1;}                                       //repeatedly multiply them by 10
 
-itoa(expt_10, expt_10_string, 10);                                //Convert the exponent to a string
-FPN_print_out(FPNum);                                             //Print out the number
-Serial.write(" E ");                                              //plus exponent
-Serial.write (expt_10_string);
+/********Reverse the proces: Step 2 Call the FPN to askii and roundig subroutines****************************************************/
+FPN_to_askii(FPNum, print_buff, sign, num_decimal_places, expt_10 );
+Serial.write(print_buff);
+Serial.write("\r\n");
 
-Serial.write("\r\n"); }}
+Serial.write("\r\nResult after rounding\t\t");
+
+Round_print_buff(print_buff);
+Serial.write(print_buff);
+
+Serial.write("\r\n\r\n*****************************************************************************************\r\n\r\n"); }}
+
+
 
 
 

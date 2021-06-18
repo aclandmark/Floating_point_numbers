@@ -1,12 +1,8 @@
 
 #include <avr/wdt.h>
 
-char data_buff[15];                                                 //Used to hold numerical strings
 char keypress;                                                 
  
-
-
-
 #define positive 1
 #define negative 0
 

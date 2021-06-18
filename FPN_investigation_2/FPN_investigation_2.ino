@@ -83,6 +83,7 @@ if  ((*long_ptr == 0x7F800000) ||                                   //Check for 
     (*long_ptr == 0xFF800000) | 
     (*long_ptr == 0X0) ||
     (*long_ptr == 0X80000000))
+
 {Serial.write("\r\n\r\nOverflow:Reset UNO to continue\r\n");while(1);}
 
 
@@ -111,6 +112,7 @@ case 4: while(FPNum < 1.0)
 
 
 /********Reverse the proces: Step 2 Call the FPN to askii and roundig subroutines****************************************************/
+
 FPN_to_askii(FPNum, print_buff, sign, num_decimal_places, expt_10 );
 Serial.write(print_buff);
 Serial.write("\r\n");

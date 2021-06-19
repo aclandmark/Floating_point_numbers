@@ -40,7 +40,7 @@ if ((keypress  == 'F')||
 
 while(1){
 
-Serial.write("\r\n\r\nRN from keyboard\t");                          //User enters a real number to be converted to a FPN
+Serial.write("\r\n\r\nRN from keyboard\t");                           //User enters a real number to be converted to a FPN
 sign = positive;                                                      //Default setting
 dp_location = Real_num_from_KBD(data_buff, &sign);                    //Subroutine echoes keypresses to screen
 
@@ -52,26 +52,21 @@ expt_2 = 127 + (LHS_length - 1);                                      //Floating
 
 
 /********Procces the fractional part of the number*********************************************************************/
-//if(dp_location == 14)                                                 //Set to 14 in the absence of any decimal places
-//binary_places = 0;                                                    //No binary places required.
-
-//else
-//{
-  RHS_of_dp = atol(data_buff + dp_location + 1);                       //Convert the decimal places to an integer number
+RHS_of_dp = atol(data_buff + dp_location + 1);                       //Convert the decimal places to an integer number
 num_leading_zeros = 0;                                                //Check for the presence of leading zeros (i.e. 7.0005)
 next_decimal_place = dp_location + 1;                                 //Location of first decimal place
 while ((data_buff[next_decimal_place++]) == '0')
 num_leading_zeros += 1;                                               //Count the number of leading zeros 
                                                        
 binary_places = 
-decimal_to_binary(RHS_of_dp,LHS_length,num_leading_zeros); //}         //Convert the integer to the max allowed num of binary places 
+decimal_to_binary(RHS_of_dp,LHS_length,num_leading_zeros);           //Convert the integer to the max allowed num of binary places 
 
 
 /********Start assembly of the FPN****************************************************************/
 if (LHS_length){FPN = LHS_of_dp << (25 - LHS_length);                  //Shift MSB to bit 24
 FPN = FPN | binary_places;}                                            //Start building the FPN
 
-else {FPN = binary_places;                                            //Special case: There are bits on the LHS of the binary point
+else {FPN = binary_places;                                            //Special case: There are no bits on the LHS of the binary point
 while (!(FPN & (( 0x80000000 >> 7))))                                 //LHS_of_dp is zero                 
 {FPN = (FPN << 1);expt_2 -= 1;}}                                      //Shift MS '1' of binary places to bit 24
 

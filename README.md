@@ -12,13 +12,11 @@ The second puts the first in a subroutine.  It then takes numbers like 123.456e1
 	Uses repeated multiplication or division to amalgamate the exponent
 Arithmetic can be performed at this stage and finally the number is reconverted back to a string.
 
-A short introduction is also provided in the .pdf document which outlines the theory in simple tetms.
+A short introduction is also provided in the .pdf document which outlines the theory in simple terms.
 
 Note:
-This project follows on from ........... which gives some useful links.
+1.	This project follows on from the Project Floating point display for the UNO posted on 23, May 2021 which gives some useful links.
 The following link which gives an IEEE-754 Floating Point Converter is also recommended:
 https://www.h-schmidt.net/FloatConverter/IEEE754.html
 
-The second project provides bettery accurracy.  For example it is more sensible to convert 8e-5 than 0.00008.
-However discrepancies still crop up with the least significant bits.  I believe that is is due to the way rounding is
-or is not carried out
+2.	When using the IEEEE converter rmember that the second project provides bettery accurracy.  For example it is more sensible to convert 8e-5 than 0.00008.
